@@ -1,7 +1,4 @@
 {
-  "scripts": {
-    "start": "nodemon index"
-  },
   "dependencies": {
     "argon2": "^0.41.1",
     "boom": "^7.3.0",
