@@ -20,6 +20,6 @@ console.log(
   process.env.EMAIL_PASS ? "Detected" : "Not detected"
 );
 
-app.listen(Port, () => {
+app.listen(Port, "0.0.0.0", () => {
   console.log(["Info"], `Server started on port ${Port}`);
 });
