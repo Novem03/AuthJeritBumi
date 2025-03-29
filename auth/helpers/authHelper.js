@@ -1,6 +1,6 @@
 const Boom = require("boom");
-const bcrypt = require("bcrypt");
-const crypto = require("crypto"); 
+const argon2 = require("argon2");
+const crypto = require("crypto");
 const _ = require("lodash");
 const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
@@ -13,14 +13,21 @@ const EmailHelper = require("./emailHelper");
 
 const jwtSecretToken = "super_strong_key";
 const jwtExpiresIn = "24h";
-const salt = bcrypt.genSaltSync(10);
 
-const __hashPassword = (password) => {
-  return bcrypt.hashSync(password, salt);
+const __hashPassword = async (password) => {
+  const hash = await argon2.hash(password, {
+    type: argon2.argon2id, // Menggunakan Argon2id untuk keamanan lebih baik
+    memoryCost: 2 ** 16, // Biaya memori (64 MiB)
+    timeCost: 3, // Jumlah iterasi
+    parallelism: 1, // Jumlah thread paralel
+  });
+  return hash;
 };
 
-const __comparePassword = (payloadPass, dbPass) => {
-  return bcrypt.compareSync(payloadPass, dbPass);
+const __comparePassword = async (payloadPass, dbPass) => {
+  const isMatch = await argon2.verify(dbPass, payloadPass);
+  if (isMatch) return true;
+  return false;
 };
 
 const __generateToken = (data) => {
@@ -29,25 +36,25 @@ const __generateToken = (data) => {
 
 const verifyEmail = async (token) => {
   try {
-      console.log("Token diterima:", token); // Tambahkan log
+    console.log("Token diterima:", token); // Tambahkan log
 
-      const user = await db.User.findOne({ where: { verificationToken: token } });
+    const user = await db.User.findOne({ where: { verificationToken: token } });
 
-      if (!user) {
-          console.error("Token tidak valid atau pengguna tidak ditemukan.");
-          throw Boom.badRequest("INVALID_TOKEN");
-      }
+    if (!user) {
+      console.error("Token tidak valid atau pengguna tidak ditemukan.");
+      throw Boom.badRequest("INVALID_TOKEN");
+    }
 
-      // Update status pengguna menjadi terverifikasi
-      await db.User.update(
-          { isVerified: true, verificationToken: null },
-          { where: { id: user.id } }
-      );
+    // Update status pengguna menjadi terverifikasi
+    await db.User.update(
+      { isVerified: true, verificationToken: null },
+      { where: { id: user.id } }
+    );
 
-      return { message: "Email berhasil diverifikasi. Silakan login." };
+    return { message: "Email berhasil diverifikasi. Silakan login." };
   } catch (err) {
-      console.error("Error saat verifikasi email:", err); // Menampilkan error di console
-      throw GeneralHelper.errorResponse(err);
+    console.error("Error saat verifikasi email:", err); // Menampilkan error di console
+    throw GeneralHelper.errorResponse(err);
   }
 };
 
@@ -55,51 +62,51 @@ const registerUser = async (dataObject) => {
   let { name, email, password, notelp, alamat, role } = dataObject;
 
   try {
-      const user = await db.User.findOne({ where: { email } });
-      if (user) {
-          throw Boom.badRequest("EMAIL_HAS_BEEN_USED");
-      }
+    const user = await db.User.findOne({ where: { email } });
+    if (user) {
+      throw Boom.badRequest("EMAIL_HAS_BEEN_USED");
+    }
 
-      const roleMapping = { "1": "user", "2": "admin" };
-      role = roleMapping[role] || role;
+    const roleMapping = { 1: "user", 2: "admin" };
+    role = roleMapping[role] || role;
 
-      if (!["user", "admin"].includes(role)) {
-          throw Boom.badRequest("INVALID_ROLE");
-      }
+    if (!["user", "admin"].includes(role)) {
+      throw Boom.badRequest("INVALID_ROLE");
+    }
 
-      const hashedPass = await __hashPassword(password);
+    const hashedPass = await __hashPassword(password);
 
-      // Buat token verifikasi
-      const verificationToken = crypto.randomBytes(32).toString("hex");
+    // Buat token verifikasi
+    const verificationToken = crypto.randomBytes(32).toString("hex");
 
-      const newUser = await db.User.create({
-          name,
-          email,
-          password: hashedPass,
-          notelp,
-          alamat,
-          role,
-          isVerified: false, // User belum diverifikasi
-          verificationToken // Simpan token di database
-      });
+    const newUser = await db.User.create({
+      name,
+      email,
+      password: hashedPass,
+      notelp,
+      alamat,
+      role,
+      isVerified: false, // User belum diverifikasi
+      verificationToken, // Simpan token di database
+    });
 
-      const verificationLink = `http://localhost:5000/auth/verify-email/${verificationToken}`;
+    const verificationLink = `http://localhost:5000/auth/verify-email/${verificationToken}`;
 
-      // Kirim email verifikasi
-      const emailSent = await EmailHelper.sendEmail(
-          email,
-          "Verifikasi Akun",
-          `Halo ${name},\n\nSilakan klik link berikut untuk mengaktifkan akun Anda:\n${verificationLink}\n\nJika Anda tidak mendaftar, abaikan email ini.\n\n Terima Kasih`
-      );
+    // Kirim email verifikasi
+    const emailSent = await EmailHelper.sendEmail(
+      email,
+      "Verifikasi Akun",
+      `Halo ${name},\n\nSilakan klik link berikut untuk mengaktifkan akun Anda:\n${verificationLink}\n\nJika Anda tidak mendaftar, abaikan email ini.\n\n Terima Kasih`
+    );
 
-      if (!emailSent) {
-          console.log("Gagal mengirim email verifikasi.");
-      }
+    if (!emailSent) {
+      console.log("Gagal mengirim email verifikasi.");
+    }
 
-      return true;
+    return true;
   } catch (err) {
-      console.error(err);
-      throw GeneralHelper.errorResponse(err);
+    console.error(err);
+    throw GeneralHelper.errorResponse(err);
   }
 };
 
@@ -107,34 +114,33 @@ const login = async (dataObject) => {
   const { email, password } = dataObject;
 
   try {
-      const user = await db.User.findOne({ where: { email } });
-      if (!user) {
-          return Promise.reject(Boom.notFound("USER_NOT_FOUND"));
-      }
+    const user = await db.User.findOne({ where: { email } });
+    if (!user) {
+      return Promise.reject(Boom.notFound("USER_NOT_FOUND"));
+    }
 
-      if (!user.isVerified) {
-          return Promise.reject(Boom.badRequest("EMAIL_NOT_VERIFIED"));
-      }
+    if (!user.isVerified) {
+      return Promise.reject(Boom.badRequest("EMAIL_NOT_VERIFIED"));
+    }
 
-      const isPassMatched = __comparePassword(password, user.password);
-      if (!isPassMatched) {
-          return Promise.reject(Boom.badRequest("WRONG_CREDENTIALS"));
-      }
+    const isPassMatched = __comparePassword(password, user.password);
+    if (!isPassMatched) {
+      return Promise.reject(Boom.badRequest("WRONG_CREDENTIALS"));
+    }
 
-      const token = __generateToken({
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role
-      });
+    const token = __generateToken({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    });
 
-      return Promise.resolve({ token });
+    return Promise.resolve({ token });
   } catch (err) {
-      console.log(err);
-      return Promise.reject(GeneralHelper.errorResponse(err));
+    console.log(err);
+    return Promise.reject(GeneralHelper.errorResponse(err));
   }
 };
-
 
 const changePassword = async (email, oldPassword, newPassword) => {
   try {
