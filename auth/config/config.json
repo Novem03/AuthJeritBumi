@@ -18,6 +18,7 @@
     "password": "evxaOLBbpgmBeNEpsRTPurXrOpGtjLPX",
     "database": "database_auth",
     "host": "mysql.railway.internal",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "port": "3306"
   }
 }
