@@ -14,11 +14,11 @@ const config = {
     dialect: "mysql",
   },
   production: {
+    use_env_variable: process.env.MYSQL_URL,
     username: process.env.MYSQLUSER,
     password: process.env.MYSQLPASSWORD,
     database: process.env.MYSQLDATABASE,
-    host: process.env.MYSQLPUBLICHOST,
-    port: process.env.MYSQLPORT,
+    host: process.env.MYSQLHOST,
     dialect: "mysql",
   },
 };

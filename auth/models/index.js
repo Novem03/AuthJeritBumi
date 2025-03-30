@@ -14,9 +14,9 @@ console.log(env, "<< env");
 console.log(config, "<< config");
 
 let sequelize;
-if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], {
-    ...config,
+if (config[process.env.NODE_ENV].use_env_variable) {
+  sequelize = new Sequelize(config[process.env.NODE_ENV].use_env_variable, {
+    ...config[process.env.NODE_ENV],
     dialectOptions: {
       family: 0, // Menambahkan dukungan untuk IPv6 jika diperlukan
     },
