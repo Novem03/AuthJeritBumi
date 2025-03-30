@@ -19,7 +19,6 @@ const config = {
     database: process.env.MYSQLDATABASE,
     host: process.env.MYSQLPUBLICHOST,
     dialect: "mysql",
-    port: process.env.MYSQLPORT,
   },
 };
 
