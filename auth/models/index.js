@@ -20,9 +20,12 @@ if (config[process.env.NODE_ENV].use_env_variable) {
   console.log(config[process.env.NODE_ENV].use_env_variable, "<< env_var");
   console.log(config[process.env.NODE_ENV], "<< config");
 
-  sequelize = new Sequelize(config[process.env.NODE_ENV].use_env_variable, {
-    ...config[process.env.NODE_ENV],
-  });
+  sequelize = new Sequelize(
+    process.env[config[process.env.NODE_ENV].use_env_variable],
+    {
+      ...config[process.env.NODE_ENV],
+    }
+  );
 } else {
   console.log("<< else");
 
