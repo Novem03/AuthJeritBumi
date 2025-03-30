@@ -15,13 +15,20 @@ console.log(config, "<< config");
 
 let sequelize;
 if (config[process.env.NODE_ENV].use_env_variable) {
+  console.log("<< use_env");
+
+  console.log(config[process.env.NODE_ENV].use_env_variable, "<< env_var");
+  console.log(config[process.env.NODE_ENV], "<< config");
+
   sequelize = new Sequelize(config[process.env.NODE_ENV].use_env_variable, {
     ...config[process.env.NODE_ENV],
-    dialectOptions: {
-      family: 0, // Menambahkan dukungan untuk IPv6 jika diperlukan
-    },
   });
 } else {
+  console.log("<< else");
+
+  console.log(config[process.env.NODE_ENV].use_env_variable, "<< env_var");
+  console.log(config[process.env.NODE_ENV], "<< config");
+
   sequelize = new Sequelize(
     config[process.env.NODE_ENV].database,
     config[process.env.NODE_ENV].username,
