@@ -6,9 +6,12 @@ const Sequelize = require("sequelize");
 const process = require("process");
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || "development";
-const config = require(__dirname + "/../config/config.json")[env];
+// const config = require(__dirname + "/../config/config.json")[env];
+const config = require("../config/config");
+
 const db = {};
 console.log(env, "<< env");
+console.log(config, "<< config");
 
 let sequelize;
 if (config.use_env_variable) {
@@ -20,16 +23,10 @@ if (config.use_env_variable) {
   });
 } else {
   sequelize = new Sequelize(
-    config.database,
-    config.username,
-    config.password,
-    {
-      ...config,
-      host: process.env.DB_HOST || config.host, // Pastikan DB_HOST dari environment digunakan
-      dialectOptions: {
-        family: 0, // IPv6 support (opsional)
-      },
-    }
+    config[process.env.NODE_ENV].database,
+    config[process.env.NODE_ENV].username,
+    config[process.env.NODE_ENV].password,
+    config[process.env.NODE_ENV]
   );
 }
 
