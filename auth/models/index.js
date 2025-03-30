@@ -1,39 +1,40 @@
 "use strict";
-
+require("dotenv").config();
 const fs = require("fs");
 const path = require("path");
 const Sequelize = require("sequelize");
 const process = require("process");
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || "development";
-// const config = require(__dirname + "/../config/config.json")[env];
 const config = require("../config/config");
 
 const db = {};
 console.log(env, "<< env");
 console.log(config, "<< config");
 
+const configEnv = config[process.env.NODE_ENV];
+
 let sequelize;
-if (config[process.env.NODE_ENV].use_env_variable) {
+if (configEnv.use_env_variable) {
   console.log("<< use_env");
 
-  console.log(config[process.env.NODE_ENV].use_env_variable, "<< env_var");
-  console.log(config[process.env.NODE_ENV], "<< config");
+  console.log(configEnv.use_env_variable, "<< env_var");
+  console.log({ ...configEnv }, "<< config");
 
-  sequelize = new Sequelize(config[process.env.NODE_ENV].use_env_variable, {
-    ...config[process.env.NODE_ENV],
+  sequelize = new Sequelize(process.env[configEnv.use_env_variable], {
+    ...configEnv,
   });
 } else {
   console.log("<< else");
 
-  console.log(config[process.env.NODE_ENV].use_env_variable, "<< env_var");
-  console.log(config[process.env.NODE_ENV], "<< config");
+  console.log(configEnv.use_env_variable, "<< env_var");
+  console.log(configEnv, "<< config");
 
   sequelize = new Sequelize(
-    config[process.env.NODE_ENV].database,
-    config[process.env.NODE_ENV].username,
-    config[process.env.NODE_ENV].password,
-    config[process.env.NODE_ENV]
+    configEnv.database,
+    configEnv.username,
+    configEnv.password,
+    configEnv
   );
 }
 
