@@ -123,7 +123,7 @@ const login = async (dataObject) => {
       return Promise.reject(Boom.badRequest("EMAIL_NOT_VERIFIED"));
     }
 
-    const isPassMatched = __comparePassword(password, user.password);
+    const isPassMatched = await __comparePassword(password, user.password);
     if (!isPassMatched) {
       return Promise.reject(Boom.badRequest("WRONG_CREDENTIALS"));
     }
