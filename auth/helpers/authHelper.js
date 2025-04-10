@@ -150,19 +150,19 @@ const changePassword = async (email, oldPassword, newPassword) => {
       },
     });
 
-    const isPassMatched = __comparePassword(oldPassword, user.password);
+    const isPassMatched = await __comparePassword(oldPassword, user.password);
     if (!isPassMatched) {
       return Promise.reject(Boom.badRequest("WRONG_CREDENTIALS"));
     }
 
-    await db.User.update(
-      { password: __hashPassword(newPassword) },
-      {
-        where: {
-          email,
-        },
-      }
-    );
+    const hashedNewPassword = await __hashPassword(newPassword);
+
+await db.User.update(
+  { password: hashedNewPassword },
+  {
+    where: { email },
+  }
+);
 
     return Promise.resolve({ message: "Successfully change password" });
   } catch (err) {
