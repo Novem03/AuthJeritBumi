@@ -29,7 +29,6 @@ const loginValidation = (data) => {
 
 const changePasswordValidation = (data) => {
   const schema = Joi.object({
-    verifiedUser: Joi.required(),
     oldPassword: Joi.string().required(),
     newPassword: Joi.string().min(6).required(),
   });
