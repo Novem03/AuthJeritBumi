@@ -206,7 +206,7 @@ const getUrlForgotPassword = async (email) => {
 
   return Promise.resolve({
     message: "resetUrl is privacy, don't share this information",
-    resetUrl: `http://localhost:5000/forgot-password/change/${token}`,
+    resetUrl: `https://authjeritbumi-production-ae42.up.railway.app/forgot-password/change/${token}`,
     token,
   });
 };
