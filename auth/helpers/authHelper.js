@@ -203,7 +203,7 @@ const getUrlForgotPassword = async (email) => {
     );
   }
 
-  const resetUrl = `http://localhost:5000/forgot-password/change/${token}`;
+  const resetUrl = `https://authjeritbumi-production-ae42.up.railway.app/forgot-password/change/${token}`;
 
   // Kirim email
   const emailSent = await EmailHelper.sendEmail(
