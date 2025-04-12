@@ -113,6 +113,51 @@ router.post("/login", login);
 router.get("/get-profile", Middleware.validateToken, getProfile);
 router.put("/change-password", Middleware.validateToken, changePassword);
 router.post("/forgot-password", getUrlForgotPassword);
+router.get("/forgot-password/change/:token", (req, res) => {
+  const { token } = req.params;
+
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Token Reset Password</title>
+        <style>
+          body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+          }
+          .card {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+          }
+          .token {
+            font-weight: bold;
+            color: #2c3e50;
+            word-break: break-all;
+            background-color: #ecf0f1;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 15px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="card">
+          <h2>Token Reset Password</h2>
+          <p>Gunakan token ini di aplikasi untuk mengubah password Anda:</p>
+          <div class="token">${token}</div>
+        </div>
+      </body>
+    </html>
+  `);
+});
 router.put("/forgot-password/change/:token", changeForgotPassword);
 router.get("/hello", Middleware.validateToken, hello);
 router.get("/auth/verify-email/:token", async (req, res) => {

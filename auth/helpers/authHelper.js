@@ -228,8 +228,10 @@ const changeForgotPassword = async (token, newPassword) => {
     return Promise.reject(Boom.badRequest("TOKEN_EXPIRED"));
   }
 
+  const hashedNewPassword = await __hashPassword(newPassword);
+
   await db.User.update(
-    { password: __hashPassword(newPassword) },
+    { password: hashedNewPassword },
     {
       where: {
         id: forgotPassword.user_id,
