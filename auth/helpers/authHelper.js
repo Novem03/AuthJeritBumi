@@ -177,15 +177,14 @@ const getUrlForgotPassword = async (email) => {
   }
 
   const currentTime = new Date();
-  const expiresIn = currentTime.setMinutes(currentTime.getMinutes() + 3);
+  const expiresIn = currentTime.setMinutes(currentTime.getMinutes() + 30); // 30 menit masa berlaku token
+  const token = uuidv4();
 
   const tokenExist = await db.ForgotPassword.findOne({
     where: {
       user_id: user.id,
     },
   });
-
-  const token = uuidv4();
 
   if (_.isEmpty(tokenExist)) {
     await db.ForgotPassword.create({
@@ -204,12 +203,24 @@ const getUrlForgotPassword = async (email) => {
     );
   }
 
+  const resetUrl = `http://localhost:5000/forgot-password/change/${token}`;
+
+  // Kirim email
+  const emailSent = await EmailHelper.sendEmail(
+    email,
+    "Reset Password",
+    `Halo ${user.name},\n\nSilakan klik link berikut untuk mereset password Anda:\n${resetUrl}\n\nLink ini berlaku selama 30 menit.\n\nJika Anda tidak meminta reset password, abaikan email ini.\n\nTerima kasih.`
+  );
+
+  if (!emailSent) {
+    console.log("Gagal mengirim email reset password.");
+  }
+
   return Promise.resolve({
-    message: "resetUrl is privacy, don't share this information",
-    resetUrl: `https://authjeritbumi-production-ae42.up.railway.app/forgot-password/change/${token}`,
-    token,
+    message: "Reset password link has been sent to your email.",
   });
 };
+
 
 const changeForgotPassword = async (token, newPassword) => {
   const forgotPassword = await db.ForgotPassword.findOne({
