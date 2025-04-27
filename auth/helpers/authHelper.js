@@ -36,7 +36,7 @@ const __generateToken = (data) => {
 
 const verifyEmail = async (token) => {
   try {
-    console.log("Token diterima:", token); // Tambahkan log
+    console.log("Token diterima:", token); 
 
     const user = await db.User.findOne({ where: { verificationToken: token } });
 
@@ -53,7 +53,7 @@ const verifyEmail = async (token) => {
 
     return { message: "Email berhasil diverifikasi. Silakan login." };
   } catch (err) {
-    console.error("Error saat verifikasi email:", err); // Menampilkan error di console
+    console.error("Error saat verifikasi email:", err); 
     throw GeneralHelper.errorResponse(err);
   }
 };
@@ -86,8 +86,8 @@ const registerUser = async (dataObject) => {
       notelp,
       alamat,
       role,
-      isVerified: false, // User belum diverifikasi
-      verificationToken, // Simpan token di database
+      isVerified: false, 
+      verificationToken, 
     });
 
     const verificationLink = `https://authjeritbumi-production-ae42.up.railway.app/auth/verify-email/${verificationToken}`;
@@ -177,7 +177,7 @@ const getUrlForgotPassword = async (email) => {
   }
 
   const currentTime = new Date();
-  const expiresIn = currentTime.setMinutes(currentTime.getMinutes() + 30); // 30 menit masa berlaku token
+  const expiresIn = currentTime.setMinutes(currentTime.getMinutes() + 30); 
   const token = uuidv4();
 
   const tokenExist = await db.ForgotPassword.findOne({

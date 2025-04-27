@@ -58,10 +58,18 @@ const forgotPasswordValidation = (data) => {
   }
 };
 
+const createSavedLocationValidation = (body) => {
+  const { label, address, latitude, longitude } = body;
+  if (!label || !address || latitude == null || longitude == null) {
+    throw new Error("All fields (label, address, latitude, longitude) are required.");
+  }
+};
+
 module.exports = {
   registerValidation,
   loginValidation,
   changePasswordValidation,
   urlForgotPasswordValidation,
   forgotPasswordValidation,
+  createSavedLocationValidation,
 };

@@ -5,6 +5,7 @@ const Middleware = require("../middleware/authMiddleware");
 const Validation = require("../helpers/validationHelper");
 const AuthHelper = require("../helpers/authHelper");
 const GeneralHelper = require("../helpers/generalHelper");
+const SavedLocationController = require("../controllers/savedLocationController");
 
 const register = async (request, reply) => {
   try {
@@ -170,6 +171,8 @@ router.get("/auth/verify-email/:token", async (req, res) => {
       res.status(400).json({ error: error.message });
   }
 });
+router.post("/saved-location", Middleware.validateToken, SavedLocationController.createSavedLocation);
+router.get("/saved-location", Middleware.validateToken, SavedLocationController.getSavedLocations);
 
 
 module.exports = router;
