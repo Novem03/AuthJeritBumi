@@ -40,7 +40,7 @@ const login = async (request, reply) => {
   } catch (err) {
     return reply
       .status(GeneralHelper.statusResponse(err))
-      .send(GeneralHelper.errorResponse(err));
+      .send(GeneralHelper.errorResponse(err)); //a
   }
 };
 
