@@ -6,6 +6,7 @@ const Validation = require("../helpers/validationHelper");
 const AuthHelper = require("../helpers/authHelper");
 const GeneralHelper = require("../helpers/generalHelper");
 const SavedLocationController = require("../controllers/savedLocationController");
+const PickupRequestController = require('../controllers/PickupRequestController');
 
 const register = async (request, reply) => {
   try {
@@ -105,7 +106,7 @@ const changeForgotPassword = async (request, reply) => {
 };
 
 const hello = async (request, reply) => {
-  return reply.send("HELLO");
+  return reply.send("HELLO"); 
 };
 
 // Gunakan "router" bukan "Router"
@@ -173,6 +174,13 @@ router.get("/auth/verify-email/:token", async (req, res) => {
 });
 router.post("/saved-location", Middleware.validateToken, SavedLocationController.createSavedLocation);
 router.get("/saved-location", Middleware.validateToken, SavedLocationController.getSavedLocations);
+
+router.post('/pickup-request', Middleware.validateToken, PickupRequestController.createPickupRequest);
+router.put('/pickup-request/:pickupRequestId', Middleware.validateToken, PickupRequestController.updatePickupRequest);
+router.delete('/pickup-request/:pickupRequestId', Middleware.validateToken, PickupRequestController.cancelPickupRequest);
+router.get('/pickup-requests', Middleware.validateToken, PickupRequestController.getPickupRequests);
+// Routes for PickupRequest
+router.get('/pickup-requests/all', Middleware.validateToken, PickupRequestController.getAllPickupRequests);
 
 
 module.exports = router;

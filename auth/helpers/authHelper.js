@@ -90,7 +90,7 @@ const registerUser = async (dataObject) => {
       verificationToken, 
     });
 
-    const verificationLink = `https://authjeritbumi-production-ae42.up.railway.app/auth/verify-email/${verificationToken}`;
+    const verificationLink = `http://localhost:5000/auth/verify-email/${verificationToken}`;
 
     // Kirim email verifikasi
     const emailSent = await EmailHelper.sendEmail(
