@@ -90,7 +90,7 @@ const registerUser = async (dataObject) => {
       verificationToken, 
     });
 
-    const verificationLink = `http://localhost:5000/auth/verify-email/${verificationToken}`;
+    const verificationLink = `https://authjeritbumi-production-dfe2.up.railway.app/auth/verify-email/${verificationToken}`;
 
     // Kirim email verifikasi
     const emailSent = await EmailHelper.sendEmail(
@@ -203,7 +203,7 @@ const getUrlForgotPassword = async (email) => {
     );
   }
 
-  const resetUrl = `https://authjeritbumi-production-ae42.up.railway.app/forgot-password/change/${token}`;
+  const resetUrl = `https://authjeritbumi-production-dfe2.up.railway.app/forgot-password/change/${token}`;
 
   // Kirim email
   const emailSent = await EmailHelper.sendEmail(
